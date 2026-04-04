@@ -1,5 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 function Login() {
+  const navigate = useNavigate();
+  function handleLogin(e) {
+    e.preventDefault(); // impede o form de recarregar a página
+    navigate("/dashboard");
+  }
   return (
     <>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -10,12 +15,12 @@ function Login() {
             className="mx-auto h-10 w-auto"
           />
           <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
-            Logue sua conta
+            Bem vindo de volta!
           </h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form action="#" method="POST" className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label
                 htmlFor="email"
@@ -56,7 +61,7 @@ function Login() {
                 <input
                   id="senha"
                   name="senha"
-                  type="senha"
+                  type="password"
                   required
                   autoComplete="current-password"
                   className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
