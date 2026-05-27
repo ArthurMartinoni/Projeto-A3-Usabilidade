@@ -1,10 +1,27 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "../supabaseClient";
+
 function Login() {
   const navigate = useNavigate();
-  function handleLogin(e) {
-    e.preventDefault(); // impede o form de recarregar a página
-    navigate("/dashboard");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState("");
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    setErro("");
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: senha,
+    });
+    if (error) {
+      setErro("Email ou senha incorretos.");
+    } else {
+      navigate("/dashboard");
+    }
   }
+
   return (
     <>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -35,6 +52,8 @@ function Login() {
                   type="email"
                   required
                   autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
                 />
               </div>
@@ -64,10 +83,14 @@ function Login() {
                   type="password"
                   required
                   autoComplete="current-password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
                   className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
                 />
               </div>
             </div>
+
+            {erro && <p className="text-red-400 text-sm text-center">{erro}</p>}
 
             <div>
               <button

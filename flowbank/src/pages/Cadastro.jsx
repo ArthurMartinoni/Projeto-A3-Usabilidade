@@ -1,8 +1,32 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { supabase } from "../supabaseClient";
+
 function Cadastro() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [erro, setErro] = useState("");
+
+  async function handleCadastro(e) {
+    e.preventDefault();
+    setErro("");
+    if (senha !== confirmarSenha) {
+      setErro("As senhas não coincidem.");
+      return;
+    }
+    const { error } = await supabase.auth.signUp({
+      email: email,
+      password: senha,
+    });
+    if (error) {
+      setErro("Erro ao criar conta: " + error.message);
+    } else {
+      navigate("/onboarding");
+    }
+  }
+
   return (
     <>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -17,7 +41,7 @@ function Cadastro() {
           </h2>
         </div>
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form action="#" method="POST" className="space-y-6">
+          <form onSubmit={handleCadastro} className="space-y-6">
             <div>
               <label
                 htmlFor="nome"
@@ -31,7 +55,7 @@ function Cadastro() {
                   name="nome"
                   type="text"
                   required
-                  autoComplete="nome"
+                  autoComplete="name"
                   className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
                 />
               </div>
@@ -50,6 +74,8 @@ function Cadastro() {
                   type="email"
                   required
                   autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
                 />
               </div>
@@ -67,7 +93,6 @@ function Cadastro() {
                   name="cpf"
                   type="text"
                   required
-                  autoComplete="cpf"
                   className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
                 />
               </div>
@@ -85,7 +110,6 @@ function Cadastro() {
                   name="senha"
                   type="password"
                   required
-                  autoComplete="senha"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
                   className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
@@ -105,13 +129,19 @@ function Cadastro() {
                   name="confirmarSenha"
                   type="password"
                   required
-                  autoComplete="confirmarSenha"
                   value={confirmarSenha}
                   onChange={(e) => setConfirmarSenha(e.target.value)}
-                  className={`block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 ${senha !== confirmarSenha && confirmarSenha ? "outline-red-500" : "outline-white/10"} placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6`}
+                  className={`block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 ${
+                    senha !== confirmarSenha && confirmarSenha
+                      ? "outline-red-500"
+                      : "outline-white/10"
+                  } placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6`}
                 />
               </div>
             </div>
+
+            {erro && <p className="text-red-400 text-sm text-center">{erro}</p>}
+
             <div>
               <button
                 type="submit"
